@@ -34,8 +34,9 @@ public:
     FpgaDemo() = default;
     ~FpgaDemo() = default;
 
-    void run();
+    int run();
 
+    bool loop = true;
 private:
 };
 
