@@ -64,6 +64,7 @@ int FpgaDemo::run() {
             NiFpga_Bool userSw0 = 0;
             uint8_t userSw1 = 5;
             NiFpga_Bool userSw2 = 6;
+            NiFpga_Bool userSw3 = 2;
 
             const int SIZE = 256;
             int16_t output[SIZE] = {0}; /* TODO: write to output buffer */
@@ -81,9 +82,13 @@ int FpgaDemo::run() {
                                                             &userSw1));
                 NiFpga_MergeStatus(&status, NiFpga_ReadBool(session, NiFpga_FPGA_VI_IndicatorBool_UserSwitch2,
                                                             &userSw2));
-                cout << "userSw0=" << ((userSw0) ? "true" : "false") << " " << hex << (int)userSw0;
-                cout << " userSw1=" << ((userSw1) ? "true" : "false") << " " << hex << (int)userSw1;
-                cout << " userSw2=" << ((userSw2) ? "true" : "false") << " " << hex << (int)userSw2 << endl;
+                NiFpga_MergeStatus(&status, NiFpga_ReadBool(session, NiFpga_FPGA_VI_IndicatorBool_UserSwitch3,
+                                                            &userSw3));
+
+                cout << "userSw0=" << ((userSw0) ? "t" : "f") << " " << hex << (int)userSw0;
+                cout << " userSw1=" << ((userSw1) ? "t" : "f") << " " << hex << (int)userSw1;
+                cout << " userSw2=" << ((userSw2) ? "t" : "f") << " " << hex << (int)userSw2;
+                cout << " userSw3=" << ((userSw3) ? "t" : "f") << " " << hex << (int)userSw3 << endl;
 
                 /*
                 // copy FIFO data to the FPGA
@@ -96,14 +101,14 @@ int FpgaDemo::run() {
                 NiFpga_MergeStatus(
                         &status, NiFpga_ReadFifoI16(session, NiFpga_FPGA_VI_TargetToHostFifoU8_U8_FIFO, input,
                                                     SIZE, NiFpga_InfiniteTimeout, NULL));
-                
+
                 string str("input=");
-                for (int j=0; j < SIZE;  ++j) {
+                for (int j = 0; j < SIZE; ++j) {
                     str += to_string(input[j]) + " ";
                 }
 
-                cout  << str << endl;
-                               
+                cout << str << endl;
+
                 /*
                 // acquire elements we can write to without an additional copy
                 NiFpga_MergeStatus(&status,
