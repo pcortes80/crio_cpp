@@ -65,14 +65,22 @@ int FpgaDemo::run() {
 
             cout << "loop start" << endl;
             NiFpga_Bool userSw0 = 0;
+            uint8_t userSw1 = 5;
+            NiFpga_Bool userSw2 = 6;
+
             while (loop) {
 
                 // read UserSwitch0
-                NiFpga_MergeStatus(
-                    &status, NiFpga_ReadBool(session, NiFpga_FPGA_VI_IndicatorBool_UserSwitch0,
-                                            &userSw0));
-                cout << "userSw0=" << ((userSw0) ? "true" : "false") << endl;
-                this_thread::sleep_for(200ms);
+                NiFpga_MergeStatus(&status, NiFpga_ReadBool(session, NiFpga_FPGA_VI_IndicatorBool_UserSwitch0,
+                                                            &userSw0));
+                NiFpga_MergeStatus(&status, NiFpga_ReadBool(session, NiFpga_FPGA_VI_IndicatorBool_UserSwitch1,
+                                                            &userSw1));
+                NiFpga_MergeStatus(&status, NiFpga_ReadBool(session, NiFpga_FPGA_VI_IndicatorBool_UserSwitch2,
+                                                            &userSw2));
+                cout << "userSw0=" << ((userSw0) ? "true" : "false") << " " << hex << (int)userSw0 ;
+                cout << " userSw1=" << ((userSw1) ? "true" : "false") << " " << hex << (int)userSw1 ;
+                cout << " userSw2=" << ((userSw2) ? "true" : "false") << " " << hex << (int)userSw2 << endl;
+                this_thread::sleep_for(500ms);
             }
 
             /* TODO: There's no stop control in this FPGA VI. Maybe one should be added.
