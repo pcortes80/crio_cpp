@@ -92,11 +92,18 @@ int FpgaDemo::run() {
                                                        output, SIZE, NiFpga_InfiniteTimeout, NULL));
                 */
                 // copy FIFO data from the FPGA
-                /* TODO: this first
+                // TODO: this first
                 NiFpga_MergeStatus(
-                        &status, NiFpga_ReadFifoI16(session, NiFpga_Example_TargetToHostFifoI16_Input, input,
+                        &status, NiFpga_ReadFifoI16(session, NiFpga_FPGA_VI_TargetToHostFifoU8_U8_FIFO, input,
                                                     SIZE, NiFpga_InfiniteTimeout, NULL));
-                */
+                
+                string str("input=");
+                for (int j=0; j < SIZE;  ++j) {
+                    str += to_string(input[j]) + " ";
+                }
+
+                cout  << str << endl;
+                               
                 /*
                 // acquire elements we can write to without an additional copy
                 NiFpga_MergeStatus(&status,
