@@ -20,15 +20,23 @@
  */
 
 #include <iostream>
+#include <thread>
 #include "demo/FpgaDemo.h"
 
 using namespace std;
 using namespace LSST;
 
 int main(int argc, char *argv[]) {
-    cout << "Hi" << endl;
+    cout << "Hi, press enter to exit" << endl;
     FpgaDemo fpga;
 
-    fpga.run();
-    return 0;    
+    thread thrd([&fpga]() {fpga.run();});
+
+    getchar();
+    cout << "stopping loop...\n";
+    fpga.stop();
+
+    thrd.join();
+
+    return 0;
 }

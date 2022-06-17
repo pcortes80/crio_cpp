@@ -42,12 +42,9 @@ int FpgaDemo::run() {
         // TODO: NiFpga_FPGA_VI_Bitfile probably needs to be prepended with a path
         string bitfile = NiFpga_FPGA_VI_Bitfile;
         cout << "opening " << bitfile << endl;
-        NiFpga_MergeStatus(&status,
-                           NiFpga_Open(bitfile.c_str(), NiFpga_FPGA_VI_Signature,
-                                       "RIO0", NiFpga_OpenAttribute_NoRun, &session));
+        NiFpga_MergeStatus(&status, NiFpga_Open(bitfile.c_str(), NiFpga_FPGA_VI_Signature, "RIO0",
+                                                NiFpga_OpenAttribute_NoRun, &session));
         if (NiFpga_IsNotError(status)) {
-
-
             // run the FPGA application
             cout << "Running the FPGA...\n";
             NiFpga_MergeStatus(&status, NiFpga_Run(session, 0));
@@ -68,8 +65,15 @@ int FpgaDemo::run() {
             uint8_t userSw1 = 5;
             NiFpga_Bool userSw2 = 6;
 
-            while (loop) {
+            const int SIZE = 256;
+            int16_t output[SIZE] = {0}; /* TODO: write to output buffer */
+            int16_t input[SIZE];
+            int16_t* writeElements;
+            int16_t* readElements;
+            size_t writeElementsAcquired;
+            size_t readElementsAcquired;
 
+            while (_loop) {
                 // read UserSwitch0
                 NiFpga_MergeStatus(&status, NiFpga_ReadBool(session, NiFpga_FPGA_VI_IndicatorBool_UserSwitch0,
                                                             &userSw0));
@@ -77,9 +81,60 @@ int FpgaDemo::run() {
                                                             &userSw1));
                 NiFpga_MergeStatus(&status, NiFpga_ReadBool(session, NiFpga_FPGA_VI_IndicatorBool_UserSwitch2,
                                                             &userSw2));
-                cout << "userSw0=" << ((userSw0) ? "true" : "false") << " " << hex << (int)userSw0 ;
-                cout << " userSw1=" << ((userSw1) ? "true" : "false") << " " << hex << (int)userSw1 ;
+                cout << "userSw0=" << ((userSw0) ? "true" : "false") << " " << hex << (int)userSw0;
+                cout << " userSw1=" << ((userSw1) ? "true" : "false") << " " << hex << (int)userSw1;
                 cout << " userSw2=" << ((userSw2) ? "true" : "false") << " " << hex << (int)userSw2 << endl;
+
+                /*
+                // copy FIFO data to the FPGA
+                NiFpga_MergeStatus(&status,
+                                   NiFpga_WriteFifoI16(session, NiFpga_Example_HostToTargetFifoI16_Output,
+                                                       output, SIZE, NiFpga_InfiniteTimeout, NULL));
+                */
+                // copy FIFO data from the FPGA
+                // TODO: this first
+                NiFpga_MergeStatus(
+                        &status, NiFpga_ReadFifoI16(session, NiFpga_FPGA_VI_TargetToHostFifoU8_U8_FIFO, input,
+                                                    SIZE, NiFpga_InfiniteTimeout, NULL));
+                
+                string str("input=");
+                for (int j=0; j < SIZE;  ++j) {
+                    str += to_string(input[j]) + " ";
+                }
+
+                cout  << str << endl;
+                               
+                /*
+                // acquire elements we can write to without an additional copy
+                NiFpga_MergeStatus(&status,
+                                   NiFpga_AcquireFifoWriteElementsI16(
+                                           session, NiFpga_Example_HostToTargetFifoI16_Output, &writeElements,
+                                           SIZE, NiFpga_InfiniteTimeout, &writeElementsAcquired, NULL));
+                if (NiFpga_IsNotError(status)) {
+                    // TODO: write directly to writeElements[0] through
+                    //         writeElements[writeElementsAcquired - 1]
+                    NiFpga_MergeStatus(&status, NiFpga_ReleaseFifoElements(
+                                                        session, NiFpga_Example_HostToTargetFifoI16_Output,
+                                                        writeElementsAcquired));
+
+                }
+                */
+
+                /* TODO: this also first?
+                // acquire elements we can read from without an additional copy
+                NiFpga_MergeStatus(&status,
+                                   NiFpga_AcquireFifoReadElementsI16(
+                                           session, NiFpga_Example_TargetToHostFifoI16_Input, &readElements,
+                                           SIZE, NiFpga_InfiniteTimeout, &readElementsAcquired, NULL));
+                if (NiFpga_IsNotError(status)) {
+                    // TODO: read directly from readElements[0] through
+                    //     readElements[readElementsAcquired - 1]
+                    NiFpga_MergeStatus(&status, NiFpga_ReleaseFifoElements(
+                                                        session, NiFpga_Example_TargetToHostFifoI16_Input,
+                                                        readElementsAcquired));
+                }
+                */
+
                 this_thread::sleep_for(500ms);
             }
 

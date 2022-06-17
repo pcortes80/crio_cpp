@@ -24,6 +24,7 @@
 #define LSST_FPGADEMO_H
 
 // System headers
+#include <atomic>
 
 
 namespace LSST {
@@ -36,8 +37,10 @@ public:
 
     int run();
 
-    bool loop = true;
+    void stop() { _loop = false; }
+
 private:
+    std::atomic<bool> _loop{true};
 };
 
 
