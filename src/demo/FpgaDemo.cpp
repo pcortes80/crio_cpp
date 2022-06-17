@@ -68,7 +68,7 @@ int FpgaDemo::run() {
 
             const int SIZE = 256;
             int16_t output[SIZE] = {0}; /* TODO: write to output buffer */
-            int16_t input[SIZE];
+            uint8_t input[SIZE];
             int16_t* writeElements;
             int16_t* readElements;
             size_t writeElementsAcquired;
@@ -98,12 +98,13 @@ int FpgaDemo::run() {
                 */
                 // copy FIFO data from the FPGA
                 // TODO: this first
+                int sz = 1;
                 NiFpga_MergeStatus(
-                        &status, NiFpga_ReadFifoI16(session, NiFpga_FPGA_VI_TargetToHostFifoU8_U8_FIFO, input,
-                                                    SIZE, NiFpga_InfiniteTimeout, NULL));
+                        &status, NiFpga_ReadFifoU8(session, NiFpga_FPGA_VI_TargetToHostFifoU8_U8_FIFO, input,
+                                                    sz, NiFpga_InfiniteTimeout, NULL));
 
                 string str("input=");
-                for (int j = 0; j < SIZE; ++j) {
+                for (int j = 0; j < sz; ++j) {
                     str += to_string(input[j]) + " ";
                 }
 
@@ -140,7 +141,7 @@ int FpgaDemo::run() {
                 }
                 */
 
-                this_thread::sleep_for(500ms);
+                this_thread::sleep_for(100ms);
             }
 
             /* TODO: There's no stop control in this FPGA VI. Maybe one should be added.
