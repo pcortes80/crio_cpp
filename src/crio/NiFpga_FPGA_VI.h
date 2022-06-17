@@ -24,7 +24,7 @@
 /**
  * The signature of the FPGA bitfile.
  */
-static const char* const NiFpga_FPGA_VI_Signature = "11B96218B1CAA44E7C404D6AEF97FB4C";
+static const char* const NiFpga_FPGA_VI_Signature = "079F0E6D7579DDE40D9F6C7C99D67270";
 
 typedef enum
 {
@@ -36,7 +36,6 @@ typedef enum
 
 typedef enum
 {
-   NiFpga_FPGA_VI_IndicatorU8_ReadFU8IFO = 0x1802E,
    NiFpga_FPGA_VI_IndicatorU8_UserSwitch30 = 0x1800E,
 } NiFpga_FPGA_VI_IndicatorU8;
 
@@ -65,8 +64,13 @@ typedef enum
 
 typedef enum
 {
-   NiFpga_FPGA_VI_TargetToHostFifoBool_SW0_FIFO = 1,
-   NiFpga_FPGA_VI_TargetToHostFifoBool_SW1_FIFO = 0,
+   NiFpga_FPGA_VI_TargetToHostFifoBool_SW0_FIFO = 2,
+   NiFpga_FPGA_VI_TargetToHostFifoBool_SW1_FIFO = 1,
 } NiFpga_FPGA_VI_TargetToHostFifoBool;
+
+typedef enum
+{
+   NiFpga_FPGA_VI_TargetToHostFifoU8_U8_FIFO = 0,
+} NiFpga_FPGA_VI_TargetToHostFifoU8;
 
 #endif
