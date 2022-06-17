@@ -29,7 +29,7 @@ else
 endif
 
 # g++ flags used in all g++ calls.
-CPP_COMMON := -std=c++14 -fPIE -pthread -Wall ${c_opts} $(GCOVR_FLAGS)
+CPP_COMMON := -std=c++17 -fPIE -pthread -Wall ${c_opts} $(GCOVR_FLAGS)
 CPP_LIBS := -L/usr/local/lib -ldl
 
 # compile x86 simulator or real cRIO stuff
