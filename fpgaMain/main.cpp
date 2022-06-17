@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
     thread thrd([&fpga]() {fpga.run();});
 
     getchar();
-    cout << "stopping loop...\n"
+    cout << "stopping loop...\n";
     fpga.stop();
 
     thrd.join();
