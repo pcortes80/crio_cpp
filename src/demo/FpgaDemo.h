@@ -29,14 +29,17 @@
 
 namespace LSST {
 
+/// Class used to test cRIO FPGA communication.
 class FpgaDemo
 {
 public:
     FpgaDemo() = default;
     ~FpgaDemo() = default;
 
+    /// Try to repeatedly read and write to the FPGA until `stop()` is called.
     int run();
 
+    /// Terminate the loop in `run()`.
     void stop() { _loop = false; }
 
 private:

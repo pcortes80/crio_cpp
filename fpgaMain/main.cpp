@@ -30,12 +30,13 @@ int main(int argc, char *argv[]) {
     cout << "Hi, press enter to exit" << endl;
     FpgaDemo fpga;
 
+    // Run the loop in a separate thread.
     thread thrd([&fpga]() {fpga.run();});
 
+    // When a key is pressed, end the loop in `run()` and wait to join.
     getchar();
     cout << "stopping loop...\n";
     fpga.stop();
-
     thrd.join();
 
     return 0;

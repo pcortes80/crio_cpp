@@ -49,17 +49,6 @@ int FpgaDemo::run() {
             cout << "Running the FPGA...\n";
             NiFpga_MergeStatus(&status, NiFpga_Run(session, 0));
 
-            /* TODO -- not for our system, delete
-            int16_t rawTemperature = 0;
-            double fahrenheit;
-            // read the current temperature
-            NiFpga_MergeStatus(
-                    &status, NiFpga_ReadI16(session, NiFpga_ExampleCompactRIO_IndicatorI16_DeviceTemperature,
-                                            &rawTemperature));
-            fahrenheit = (rawTemperature / 4.0) * (9.0 / 5.0) + 32;
-            printf("Current temperature in Fahrenheit: %.1f\n", fahrenheit);
-            */
-
             cout << "loop start" << endl;
             NiFpga_Bool userSw0 = 0;
             uint8_t userSw1 = 5;
@@ -150,11 +139,11 @@ int FpgaDemo::run() {
                                NiFpga_WriteBool(session, NiFpga_ExampleCompactRIO_ControlBool_Stop, 1));
             */
             // close the session now that we're done
-            printf("Closing the session...\n");
+            cout << "Closing the session...\n";
             NiFpga_MergeStatus(&status, NiFpga_Close(session, 0));
         }
         // must be called after all other calls
-        printf("Finalizing...\n");
+        cout << "Finalizing...\n";
         NiFpga_MergeStatus(&status, NiFpga_Finalize());
     }
     // check if anything went wrong
