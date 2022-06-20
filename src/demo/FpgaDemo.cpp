@@ -123,6 +123,7 @@ int FpgaDemo::run() {
 
                 // Change the output for the next loop
                 output[0] = output[SIZE - 1];
+                if (output[0] > 20000) output[0] = -20000;
                 for (int j=1; j < SIZE; ++j) {
                     output[j] = output[j-1] + 1;
                 }
