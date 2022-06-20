@@ -56,12 +56,20 @@ int FpgaDemo::run() {
             NiFpga_Bool userSw3 = 2;
 
             const int SIZE = 256;
-            int16_t output[SIZE] = {0}; /* TODO: write to output buffer */
-            uint8_t input[SIZE];
+            uint8_t inputSwitches[SIZE]; /// input form FPGA switches
+            int16_t output[SIZE] = {0}; /// output to FPGA FIFO_A
+            int16_t input[SIZE];  /// input from FPGA FIFO_B
+            /* TODO: alternate fifo read and write methods?
             int16_t* writeElements;
             int16_t* readElements;
             size_t writeElementsAcquired;
             size_t readElementsAcquired;
+            */
+
+            // Put something identifiable in the output buffer
+            for (int j=1; j < SIZE; ++j) {
+                output[j] = output[j-1] + 1;
+            }
 
             while (_loop) {
                 // read UserSwitch0
@@ -79,27 +87,47 @@ int FpgaDemo::run() {
                 cout << " userSw2=" << ((userSw2) ? "t" : "f") << " " << hex << (int)userSw2;
                 cout << " userSw3=" << ((userSw3) ? "t" : "f") << " " << hex << (int)userSw3 << endl;
 
-                /*
-                // copy FIFO data to the FPGA
-                NiFpga_MergeStatus(&status,
-                                   NiFpga_WriteFifoI16(session, NiFpga_Example_HostToTargetFifoI16_Output,
-                                                       output, SIZE, NiFpga_InfiniteTimeout, NULL));
-                */
-                // copy FIFO data from the FPGA
-                // TODO: this first
+                // copy FIFO data from the FPGA that's connected to the switches.
                 int sz = 1;
                 NiFpga_MergeStatus(
-                        &status, NiFpga_ReadFifoU8(session, NiFpga_FPGA_VI_TargetToHostFifoU8_U8_FIFO, input,
+                        &status, NiFpga_ReadFifoU8(session, NiFpga_FPGA_VI_TargetToHostFifoU8_U8_FIFO, inputSwitches,
                                                     sz, NiFpga_InfiniteTimeout, NULL));
 
-                string str("input=");
+                string str("switches=");
                 for (int j = 0; j < sz; ++j) {
-                    str += to_string(input[j]) + " ";
+                    str += to_string(inputSwitches[j]) + " ";
                 }
-
                 cout << str << endl;
 
-                /*
+                // copy FIFO data to FPGA FIFO_A
+                NiFpga_MergeStatus(&status,
+                                   NiFpga_WriteFifoI16(session, NiFpga_FPGA_VI_HostToTargetFifoI16_FIFO_A,
+                                                       output, SIZE, NiFpga_InfiniteTimeout, NULL));
+
+                // copy FIFO data from the FPGA FIFO_B
+                NiFpga_MergeStatus(
+                        &status, NiFpga_ReadFifoI16(session, NiFpga_FPGA_VI_TargetToHostFifoI16_FIFO_B, input,
+                                                    SIZE, NiFpga_InfiniteTimeout, NULL));
+
+                str = " input=";
+                for (int j = 0; j < SIZE; ++j) {
+                    str += to_string(input[j]) + " ";
+                }
+                cout << str << endl;
+
+                str = "output=";
+                for (int j = 0; j < SIZE; ++j) {
+                    str += to_string(output[j]) + " ";
+                }
+                cout << str << endl;
+
+                // Change the output for the next loop
+                output[0] = output[SIZE - 1];
+                if (output[0] > 20000) output[0] = -20000;
+                for (int j=1; j < SIZE; ++j) {
+                    output[j] = output[j-1] + 1;
+                }
+                /* TODO: this looks like method that may be faster for reading FIFO's, need to look into it.
                 // acquire elements we can write to without an additional copy
                 NiFpga_MergeStatus(&status,
                                    NiFpga_AcquireFifoWriteElementsI16(
